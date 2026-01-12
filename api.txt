@@ -1,0 +1,50 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(MaterialApp(home: ApiList()));
+}
+
+class ApiList extends StatefulWidget {
+  @override
+  _ApiListState createState() => _ApiListState();
+}
+
+class _ApiListState extends State<ApiList> {
+  List users = [];
+
+  Future<void> fetchData() async {
+    final response = await http.get(
+      Uri.parse('https://jsonplaceholder.typicode.com/users'),
+    );
+
+    setState(() {
+      users = jsonDecode(response.body);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("API List")),
+      body: users.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(users[index]['name']),
+                  subtitle: Text(users[index]['email']),
+                );
+              },
+            ),
+    );
+  }
+}
